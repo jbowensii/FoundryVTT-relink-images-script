@@ -81,7 +81,7 @@ function handlepathForm(html) {
   }).render(true);
 }
 
-function determinenewPath(html) {
+async function determinenewPath(html) {
   // This form allows the editing of the original path found in the folderform to be edited
   // the user will remove the end of the path that remained the same after the move
   // the use will then input the new path (which can start no higher that the foundrydata directory where wolrds directory resides)
@@ -101,13 +101,11 @@ function determinenewPath(html) {
     ui.notifications.info(`relinking... ${i} / ${folder[0].content.length}`);
     originalPath =  folder[0].content[i].data.img;
     replacementPath = originalPath.replace(oldPath, newPath);    
-    folder[0].content[i].data.img = replacementPath;
-    await Actor.update(folder[0].content[i].data.img);
+    await folder[0].content[1].update({"data.img" : replacementPath});
     if (folderType == "Actor") {
       originalPath =  folder[0].content[i].data.token.img;
       replacementPath = originalPath.replace(oldPath, newPath);    
-      folder[0].content[i].data.token.img = replacementPath;  
-      await Actor.update(folder[0].content[i].data.token.img);
+      await folder[0].content[1].update({"data.token.img" : replacementPath});
     }
   }
   return ui.notifications.info("relinking complete...");
