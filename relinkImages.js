@@ -3,6 +3,7 @@
 
 var examplefolderPath;
 var folder;
+var folderType;
 
 main()
 
@@ -43,7 +44,7 @@ function handlefolderandtypeForm() {
 // Select the folder and type to determine the imagePath where Foundry thinks the images currently reside
 function exampleFolder(html) {
   const gameFolder            = html.find(`input#gameFolder`)[0].value;
-  const folderType            = html.find(`select#entityType`)[0].value;
+        folderType            = html.find(`select#entityType`)[0].value;
     
   // ask for the game folder that contains the objects that need a new image path
   // test to make sure there are the corrrect type and no duplicate folders with that name
@@ -97,8 +98,17 @@ function determinenewPath(html) {
   // for every entity in folder[0].content[] remove oldPath and replace it with newPath
   // then set the new image path back in the entity 
   for (i = 0; i < folder[0].content.length; i++) {
+    ui.notifications.info(`relinking... ${i} / ${folder[0].content.length}`);
     originalPath =  folder[0].content[i].data.img;
     replacementPath = originalPath.replace(oldPath, newPath);    
     folder[0].content[i].data.img = replacementPath;
+    await Actor.update(folder[0].content[i].data.img);
+    if (folderType == "Actor") {
+      originalPath =  folder[0].content[i].data.token.img;
+      replacementPath = originalPath.replace(oldPath, newPath);    
+      folder[0].content[i].data.token.img = replacementPath;  
+      await Actor.update(folder[0].content[i].data.token.img);
+    }
   }
+  return ui.notifications.info("relinking complete...");
 }
