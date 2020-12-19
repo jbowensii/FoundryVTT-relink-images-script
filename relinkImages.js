@@ -101,11 +101,13 @@ async function determinenewPath(html) {
     ui.notifications.info(`relinking... ${i} / ${folder[0].content.length}`);
     originalPath =  folder[0].content[i].data.img;
     replacementPath = originalPath.replace(oldPath, newPath);    
-    await folder[0].content[1].update({"data.img" : replacementPath});
+    folder[0].content[i].data.img = replacementPath;
+    await folder[0].content[1].update({"img" : replacementPath});
     if (folderType == "Actor") {
       originalPath =  folder[0].content[i].data.token.img;
-      replacementPath = originalPath.replace(oldPath, newPath);    
-      await folder[0].content[1].update({"data.token.img" : replacementPath});
+      replacementPath = originalPath.replace(oldPath, newPath);  
+      folder[0].content[i].data.token.img = replacementPath;  
+      await folder[0].content[1].update({"token.img" : replacementPath});
     }
   }
   return ui.notifications.info("relinking complete...");
