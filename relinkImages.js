@@ -5,11 +5,7 @@ var examplefolderPath;
 var folder;
 var folderType;
 
-main()
-
-async function main() {
-    handlefolderandtypeForm();
-}
+handlefolderandtypeForm();
 
 // Collect the folder name and folder type whose data will be scanned and image location replaces
 function handlefolderandtypeForm() {
@@ -29,7 +25,7 @@ function handlefolderandtypeForm() {
     <br />
   `;
 
-  const dialog1 = new Dialog({
+  new Dialog({
     title: "Select a folder that needs Image reLinking",
     content: folderform,
     buttons: {
@@ -61,15 +57,17 @@ function exampleFolder(html) {
 
 function handlepathForm(html) {
   const pathform = `
-  <div>Old Folder: <input type="string" name="removePath" value=${examplefolderPath} style="width:300px"/></div>
-  <br />
+    <div>Old Folder: <input type="string" name="removePath" value=${examplefolderPath} style="width:600px"/></div>
+    <br />
 
-  <div>New Folder: <input type="string" name="addPath" style="width:300px"/></div>
-  <br />
+    <div>New Folder: <input type="string" name="addPath" style="width:600px"/></div>
+    <br />
+  </div>
   `;
 
+
   // Display second dialog with imagePath ready for editing... 
-  const dialog2 = new Dialog({
+  new Dialog({
     title: "Edit old path and copy in new path",
     content: pathform,
     buttons: {
@@ -82,33 +80,75 @@ function handlepathForm(html) {
 }
 
 async function determinenewPath(html) {
-  // This form allows the editing of the original path found in the folderform to be edited
-  // the user will remove the end of the path that remained the same after the move
-  // the use will then input the new path (which can start no higher that the foundrydata directory where wolrds directory resides)
+    // This form allows the editing of the original path found in the folderform to be edited
+    // the user will remove the end of the path that remained the same after the move
+    // the use will then input the new path (which can start no higher that the foundrydata directory where wolrds directory resides)
+    
+    var i;
+    var j;
+    var originalPath;
+    var replacementPath;
+    var tokenReplacementPath;
+    var oldPath;
+    var newPath;
+    var entityId;
+    var tileReplacementPath;
+    var sceneTiles; 
+    var tileEntityId; 
+    var updates = [];
+    var update;
   
-  var i;
-  var originalPath;
-  var replacementPath;
-  var oldPath;
-  var newPath;
+    oldPath = html.find("[name=removePath]")[0].value;
+    newPath = html.find("[name=addPath]")[0].value;
 
-  oldPath = html.find("[name=removePath]")[0].value;
-  newPath = html.find("[name=addPath]")[0].value;
+    // for every entity in folder[0].content[] remove oldPath and replace it with newPath
+    // then set the new image path back in the entity 
+    for (i = 0; i < folder[0].content.length; i++) {
+      originalPath =  folder[0].content[i].data.img;
+      replacementPath = originalPath.replace(oldPath, newPath); 
+      entityId = folder[0].content[i].id;
+     
+      switch (folderType) {
+        case "Actor":
+          originalPath =  folder[0].content[i].data.token.img;
+          tokenReplacementPath = originalPath.replace(oldPath, newPath); 
+          update = { "_id": entityId, "img": replacementPath, "token.img": tokenReplacementPath };
+          break;
+        case "Scene":
+          sceneTiles = duplicate(folder[0].content[i].data.tiles);
+          for (j = 0; j < folder[0].content[i].data.tiles.length; j++) {
+            tileReplacementPath = originalPath.replace(oldPath, newPath);
+            tileEntityId = folder[0].content[i].data.tiles.id; 
+            update = { "_id": tileEntityId, "img": tileReplacementPath };  
+          }
+          update = { "_id": entityId, "img": replacementPath };          
+          break;
+        case "JournalEntry":
+          update = { "_id": entityId, "img": replacementPath };    
+          break;
+        case "Item":
+          update = { "_id": entityId, "img": replacementPath };          
+          break;
+       }
 
-  // for every entity in folder[0].content[] remove oldPath and replace it with newPath
-  // then set the new image path back in the entity 
-  for (i = 0; i < folder[0].content.length; i++) {
-    ui.notifications.info(`relinking... ${i} / ${folder[0].content.length}`);
-    originalPath =  folder[0].content[i].data.img;
-    replacementPath = originalPath.replace(oldPath, newPath);    
-    folder[0].content[i].data.img = replacementPath;
-    await folder[0].content[1].update({"img" : replacementPath});
-    if (folderType == "Actor") {
-      originalPath =  folder[0].content[i].data.token.img;
-      replacementPath = originalPath.replace(oldPath, newPath);  
-      folder[0].content[i].data.token.img = replacementPath;  
-      await folder[0].content[1].update({"token.img" : replacementPath});
+      updates.push(update);
     }
+    console.log(updates);
+    
+    switch (folderType) {
+        case "Actor":
+          await Actor.update(updates);           
+          break;
+        case "Scene":
+          await Scene.update(updates);          
+          break;
+        case "JournalEntry":
+          await JournalEntry.update(updates);    
+          break;
+        case "Item":
+          await Item.update(updates);          
+          break;
+       }
+   
+       return ui.notifications.info("relinking complete...");
   }
-  return ui.notifications.info("relinking complete...");
-}
