@@ -57,6 +57,7 @@ function exampleFolder(html) {
 
 function handlepathForm(html) {
   const pathform = `
+    <div style="display: inline-block; width: 1500px"></div>
     <div>Old Folder: <input type="string" name="removePath" value=${examplefolderPath} style="width:600px"/></div>
     <br />
 
@@ -95,19 +96,19 @@ async function determinenewPath(html) {
     var tileReplacementPath;
     var sceneTiles; 
     var tileEntityId; 
-    var updates = [];
     var update;
+    var updates = [];
   
     oldPath = html.find("[name=removePath]")[0].value;
     newPath = html.find("[name=addPath]")[0].value;
-
+  
     // for every entity in folder[0].content[] remove oldPath and replace it with newPath
     // then set the new image path back in the entity 
     for (i = 0; i < folder[0].content.length; i++) {
       originalPath =  folder[0].content[i].data.img;
-      replacementPath = originalPath.replace(oldPath, newPath); 
+      if (originalPath != "") replacementPath = originalPath.replace(oldPath, newPath); 
       entityId = folder[0].content[i].id;
-     
+      
       switch (folderType) {
         case "Actor":
           originalPath =  folder[0].content[i].data.token.img;
@@ -116,12 +117,10 @@ async function determinenewPath(html) {
           break;
         case "Scene":
           sceneTiles = duplicate(folder[0].content[i].data.tiles);
-          for (j = 0; j < folder[0].content[i].data.tiles.length; j++) {
-            tileReplacementPath = originalPath.replace(oldPath, newPath);
-            tileEntityId = folder[0].content[i].data.tiles.id; 
-            update = { "_id": tileEntityId, "img": tileReplacementPath };  
+          for (j = 0; j < sceneTiles.length; j++) {
+            sceneTiles[j].img = originalPath.replace(oldPath, newPath);
           }
-          update = { "_id": entityId, "img": replacementPath };          
+          update = { "_id": entityId, "img": replacementPath, "tiles.img": sceneTiles };
           break;
         case "JournalEntry":
           update = { "_id": entityId, "img": replacementPath };    
@@ -149,6 +148,6 @@ async function determinenewPath(html) {
           await Item.update(updates);          
           break;
        }
-   
+    
        return ui.notifications.info("relinking complete...");
   }
