@@ -58,10 +58,10 @@ function exampleFolder(html) {
 function handlepathForm(html) {
   const pathform = `
     <div style="display: inline-block; width: 1500px"></div>
-    <div>Old Folder: <input type="string" name="removePath" value=${examplefolderPath} style="width:600px"/></div>
+    <div>part to replace:         <input type="string" name="removePath" value=${examplefolderPath} style="width:600px"/></div>
     <br />
 
-    <div>New Folder: <input type="string" name="addPath" style="width:600px"/></div>
+    <div>part to replace it with: <input type="string" name="addPath" style="width:600px"/></div>
     <br />
   </div>
   `;
@@ -69,7 +69,7 @@ function handlepathForm(html) {
 
   // Display second dialog with imagePath ready for editing... 
   new Dialog({
-    title: "Edit old path and copy in new path",
+    title: "Tell me what part of the path to replace and what to replace it with...",
     content: pathform,
     buttons: {
       use: {
