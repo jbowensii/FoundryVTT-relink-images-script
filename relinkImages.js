@@ -93,9 +93,10 @@ async function determinenewPath(html) {
     var oldPath;
     var newPath;
     var entityId;
-    var tileReplacementPath;
     var sceneTiles; 
-    var tileEntityId; 
+    var sceneTilePath; 
+    var originalTilePath; 
+    var tileId;
     var update;
     var updates = [];
   
@@ -105,23 +106,31 @@ async function determinenewPath(html) {
     // for every entity in folder[0].content[] remove oldPath and replace it with newPath
     // then set the new image path back in the entity 
     for (i = 0; i < folder[0].content.length; i++) {
+      replacementPath = "";
       originalPath =  folder[0].content[i].data.img;
       if (originalPath != "") replacementPath = originalPath.replace(oldPath, newPath); 
       entityId = folder[0].content[i].id;
       
       switch (folderType) {
         case "Actor":
-          originalPath =  folder[0].content[i].data.token.img;
-          tokenReplacementPath = originalPath.replace(oldPath, newPath); 
+          originalTilePath =  folder[0].content[i].data.token.img;
+          tokenReplacementPath = originalTilePath.replace(oldPath, newPath); 
           update = { "_id": entityId, "img": replacementPath, "token.img": tokenReplacementPath };
           break;
         case "Scene":
           sceneTiles = duplicate(folder[0].content[i].data.tiles);
+          console.log(sceneTiles);
           for (j = 0; j < sceneTiles.length; j++) {
-            sceneTiles[j].img = originalPath.replace(oldPath, newPath);
+            sceneTilePath = sceneTiles[j].img;
+            sceneTiles[j].img = sceneTilePath.replace(oldPath, newPath);
+            tileId = sceneTiles[j]._id;
+//console.log(tileId);
+//console.log(sceneTiles[j].img);
+//debugger;
+            update = { "_id": tileId, "img": replacementPath, "tiles.img": sceneTiles[j].img };
           }
-          update = { "_id": entityId, "img": replacementPath, "tiles.img": sceneTiles };
-          break;
+          // update = { "_id": entityId, "img": replacementPath, "tiles.img": sceneTiles };
+        break;
         case "JournalEntry":
           update = { "_id": entityId, "img": replacementPath };    
           break;
@@ -132,6 +141,7 @@ async function determinenewPath(html) {
 
       updates.push(update);
     }
+    console.log("------");
     console.log(updates);
     
     switch (folderType) {
@@ -139,7 +149,7 @@ async function determinenewPath(html) {
           await Actor.update(updates);           
           break;
         case "Scene":
-          await Scene.update(updates);          
+          // await Scene.update(updates);          
           break;
         case "JournalEntry":
           await JournalEntry.update(updates);    
