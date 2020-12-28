@@ -119,17 +119,12 @@ async function determinenewPath(html) {
           break;
         case "Scene":
           sceneTiles = duplicate(folder[0].content[i].data.tiles);
-          console.log(sceneTiles);
           for (j = 0; j < sceneTiles.length; j++) {
             sceneTilePath = sceneTiles[j].img;
             sceneTiles[j].img = sceneTilePath.replace(oldPath, newPath);
             tileId = sceneTiles[j]._id;
-//console.log(tileId);
-//console.log(sceneTiles[j].img);
-//debugger;
-            update = { "_id": tileId, "img": replacementPath, "tiles.img": sceneTiles[j].img };
           }
-          // update = { "_id": entityId, "img": replacementPath, "tiles.img": sceneTiles };
+          update = { "_id": tileId, "img": replacementPath, "tiles": sceneTiles };
         break;
         case "JournalEntry":
           update = { "_id": entityId, "img": replacementPath };    
@@ -138,18 +133,16 @@ async function determinenewPath(html) {
           update = { "_id": entityId, "img": replacementPath };          
           break;
        }
-
       updates.push(update);
     }
-    console.log("------");
-    console.log(updates);
+//console.log(updates);
     
     switch (folderType) {
         case "Actor":
           await Actor.update(updates);           
           break;
         case "Scene":
-          // await Scene.update(updates);          
+          await Scene.update(updates);          
           break;
         case "JournalEntry":
           await JournalEntry.update(updates);    
