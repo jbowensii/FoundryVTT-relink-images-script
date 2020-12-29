@@ -124,7 +124,8 @@ async function determinenewPath(html) {
             sceneTiles[j].img = sceneTilePath.replace(oldPath, newPath);
             tileId = sceneTiles[j]._id;
           }
-          update = { "_id": tileId, "img": replacementPath, "tiles": sceneTiles };
+          update = { "img": replacementPath, "tiles": sceneTiles };
+          await game.scenes.updateAll(s => update, s => s.data.name == folder[0].content[i].data.name);  
         break;
         case "JournalEntry":
           update = { "_id": entityId, "img": replacementPath };    
@@ -135,14 +136,13 @@ async function determinenewPath(html) {
        }
       updates.push(update);
     }
-//console.log(updates);
-    
+  
     switch (folderType) {
         case "Actor":
           await Actor.update(updates);           
           break;
         case "Scene":
-          await Scene.update(updates);          
+          // Had to await update in the individual scenes, since easch scenes is a double nested array of objects to included (Tiles) no idea why.          
           break;
         case "JournalEntry":
           await JournalEntry.update(updates);    
