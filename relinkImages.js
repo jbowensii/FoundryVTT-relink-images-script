@@ -13,16 +13,15 @@ function handlefolderandtypeForm() {
   let entityType = COMPENDIUM_ENTITY_TYPES.map(type => `<option value="${type}">${type}</option>`); 
 
   const folderform = `
-    <div style="display: inline-block; width: 100px">Folder:</div>
-    <input type="string" id="gameFolder">
-    <br />
-
-    <div style="display: inline-block; width: 100px">Folder Type:</div>
-    <select id="entityType" />
+    <p>Folder: <br>
+    <input type="string" style="width:100%; margin-bottom:8px" id="gameFolder">
+    </p>
+    <p>
+    Folder Type: <select id="entityType" />
       <option value="">--</option>
       ${entityType}
     </select>
-    <br />
+    </p>
   `;
 
   new Dialog({
@@ -57,19 +56,20 @@ function exampleFolder(html) {
 
 function handlepathForm(html) {
   const pathform = `
-    <div style="display: inline-block; width: 1500px"></div>
-    <div>part to replace:         <input type="string" name="removePath" value=${examplefolderPath} style="width:600px"/></div>
-    <br />
-
-    <div>part to replace it with: <input type="string" name="addPath" style="width:600px"/></div>
-    <br />
+    <div style="display: block;">
+      <p> Tell me what part of the image path to SEARCH for and what to REPLACE it with.</p>
+      <p>SEARCH for:<br>
+      <textarea type="string" name="removePath" style="width:100%;" rows="5">${examplefolderPath}</textarea> 
+      </p>
+      <p>REPLACE with:<br>
+      <textarea type="string" name="addPath" style="width:100%;" rows="5"></textarea>
+      </p>
   </div>
   `;
 
-
   // Display second dialog with imagePath ready for editing... 
   new Dialog({
-    title: "Tell me what part of the path to replace and what to replace it with...",
+    title: "Search and Replace",
     content: pathform,
     buttons: {
       use: {
