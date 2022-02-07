@@ -1,5 +1,6 @@
 // Re-link Images to Items after manual data move
-// DISCORD: jbowens#0415  
+// DISCORD: jbowens#0415 
+// Updated for FoundryVTT v9
 
 var examplefolderPath;
 var folder;
@@ -10,7 +11,7 @@ handlefolderandtypeForm();
 // Collect the folder name and folder type whose data will be scanned and image location replaces
 function handlefolderandtypeForm() {
   
-  let entityType = COMPENDIUM_ENTITY_TYPES.map(type => `<option value="${type}">${type}</option>`); 
+  let entityType = CONST.COMPENDIUM_ENTITY_TYPES.map(type => `<option value="${type}">${type}</option>`); 
 
   const folderform = `
     <p>Folder: <br>
@@ -139,16 +140,16 @@ async function determinenewPath(html) {
   
     switch (folderType) {
         case "Actor":
-          await Actor.update(updates);           
+          await Actor.updateDocuments(updates);           
           break;
         case "Scene":
           // Had to await update in the individual scenes, since easch scenes is a double nested array of objects to included (Tiles) no idea why.          
           break;
         case "JournalEntry":
-          await JournalEntry.update(updates);    
+          await JournalEntry.updateDocuments(updates);    
           break;
         case "Item":
-          await Item.update(updates);          
+          await Item.updateDocuments(updates);          
           break;
        }
     
