@@ -1,5 +1,6 @@
 // Re-link Images to Items after manual data move
-// DISCORD: jbowens#0415  
+// DISCORD: jbowens#0415 
+// Updated for FoundryVTT v9
 
 var examplefolderPath;
 var folder;
